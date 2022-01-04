@@ -50,15 +50,15 @@ This repository implements most of the features which are required for complete 
 [**Python 3.7.0**](https://www.python.org/) or greater and other libraries are required listed in the requirements.txt including
 [**mediapipe**](https://google.github.io/mediapipe/). You must install Python before you proceed further.
 
-<!-- ```bash
-# clone the repository 
-$ git clone https://github.com/NaumanHSA/Real-Time-Traffic-Monitoring-System-using-YOLOv5.git
-
-$ cd yolov5
-$ pip install -r requirements.txt
-``` -->
-
 ```bash
+# clone the repository 
+$ git clone https://github.com/NaumanHSA/Real-Time-Face-Orientation-Estimation-Yaw-Pitch-Roll.git
+
+$ cd Real-Time-Face-Orientation-Estimation-Yaw-Pitch-Roll
+$ pip install -r requirements.txt
+```
+
+<!-- ```bash
 # step 1: 
 # download and extract the zip file containing the code 
 
@@ -69,7 +69,7 @@ $ cd code
 # step 3:
 # Run the following command to install the required packages
 $ pip install -r requirements.txt
-```
+``` -->
 
 </details>
 
