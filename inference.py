@@ -64,11 +64,10 @@ with mp_face_mesh.FaceMesh(
                     # draw face rectangle
                     start_pnt, end_pnt = get_face_rect(image, face_landmarks, offset=0.5)
                     drawing_utils.drawfacerect(image, start_pnt, end_pnt, GREEN_COLOR, thickness=2, style="dashed")
-
+                    
                     # detect face rotation on z-axis (also called roll)
                     roll_angle = roll.detect(image, face_landmarks, 
-                        consts.FACEMESH_RIGHT_EYE, 
-                        consts.FACEMESH_LEFT_EYE,
+                        consts.FACEMESH_ROLL_POINTS,
                         vis=cfg.VIS
                         )
 
@@ -104,10 +103,8 @@ with mp_face_mesh.FaceMesh(
                     yaw_index = yaw.detect(
                         image, 
                         face_landmarks, 
-                        consts.FACEMESH_RIGHT_EYE,
-                        consts.FACEMESH_LEFT_EYE,
-                        consts.FACEMESH_LEFT_CHEEK,
-                        consts.FACEMESH_RIGHT_CHEEK,
+                        consts.FACEMESH_LEFT_POINTS,
+                        consts.FACEMESH_RIGHT_POINTS,
                         vis=cfg.VIS
                         )
 
@@ -144,8 +141,8 @@ with mp_face_mesh.FaceMesh(
 
             if key & 0xFF == 27:
                 break
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
 cap.release()
 cv2.destroyAllWindows()

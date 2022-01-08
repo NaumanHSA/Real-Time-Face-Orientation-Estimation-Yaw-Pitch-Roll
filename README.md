@@ -23,7 +23,7 @@ Our algorithm works on the top of MediaPipe Face Mesh solution that has been use
 
 <br>
 <div align="center">
-  <img width="80%" src="./gallery/face_landmarks.png"></a>
+  <img width="80%" src="./gallery/face_landmarks_2.png"></a>
   <br>
   Fig 1: Three different types of orientations along x-axis, y-axis and z-axis
 </div>

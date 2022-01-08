@@ -31,61 +31,62 @@ def draw_slider(image, x_min, x_max):
     cv2.putText(image, '1', (x_max - 5, 70), font, 0.75, BLUE_COLOR, 2, cv2.LINE_AA)
 
 
-def draw_eyes_line(image, right_eye_center, left_eye_center, offset=100, color=YELLOW_COLOR):
-    m = (right_eye_center[1] - left_eye_center[1]) / (right_eye_center[0] - left_eye_center[0])
-    c = int(right_eye_center[1] - (m * right_eye_center[0]))
-    x1 = left_eye_center[0] - offset
-    x2 = right_eye_center[0] + offset
-    y1, y2 = int(m * x1) + c, int(m * x2) + c
+def draw_horizontal_face_line(image, points, offset=100, color=YELLOW_COLOR):
+
+    points = sorted(points, key=lambda x: x[0])
+    x = [pnt[0] for pnt in points]    
+    y = [pnt[1] for pnt in points]    
+
+    # find the coefficients for the best fit line on x and y
+    m, b = np.polyfit(x, y, 1)
+
+    # find the extream points and draw the line
+    x1 = points[0][0] - offset
+    x2 = points[-1][0] + offset
+    y1, y2 = int(m * x1 + b), int(m * x2 + b)
     cv2.line(image, (x1, y1), (x2, y2), color, 2)
-    cv2.circle(image, right_eye_center, 5, color, -1)
-    cv2.circle(image, left_eye_center, 5, color, -1)
+
+
+# function to get the sum of eucledian distances between all the points
+def get_distance(points):
+    points = sorted(points, key=lambda x: x[0])
+    distance = 0
+    for i in range(len(points) - 1):
+        distance += math.sqrt(((points[i + 1][0] - points[i][0]) ** 2) + ((points[i + 1][1] - points[i][1]) ** 2))
+    return distance
 
 
 def detect(
     image: np.ndarray,
     landmark_list: landmark_pb2.NormalizedLandmarkList,
-    right_eye_indices: list,
-    left_eye_indices: list,
-    left_cheek_indices: list,
-    right_cheek_indices: list,
+    right_face_indices: list,
+    left_face_indices: list,
     vis=True):
 
     image_rows, image_cols, _ = image.shape
-    right_eye_center_points = []
-    left_eye_center_points = []
+    right_face_points = []
+    left_face_points = []
 
     circle_radius = 2
 
-    right_cheek_center = []
-    left_cheek_center = []
     for idx, landmark in enumerate(landmark_list.landmark):
 
         landmark_px = normalized_to_pixel_coordinates(landmark.x, landmark.y, image_cols, image_rows)
 
         # only draw the landmarks specified in the filter_lansmarks
-        if idx in right_eye_indices and landmark_px:
-            right_eye_center_points.append(landmark_px)
-        elif idx in left_eye_indices and landmark_px:
-            left_eye_center_points.append(landmark_px)
-        elif idx in left_cheek_indices and landmark_px:
-            left_cheek_center = landmark_px
-        elif idx in right_cheek_indices and landmark_px:
-            right_cheek_center = landmark_px
+        if idx in right_face_indices and landmark_px:
+            right_face_points.append(landmark_px)
+        elif idx in left_face_indices and landmark_px:
+            left_face_points.append(landmark_px)
         else:
             continue
-        
-        # cv2.circle(image, landmark_px, circle_radius, RED_COLOR, -1)
-
-    right_eye_center = [int(statistics.mean(i)) for i in zip(*right_eye_center_points)]
-    left_eye_center = [int(statistics.mean(i)) for i in zip(*left_eye_center_points)]
 
     scaled_value = -1
-    if len(right_cheek_center) > 0 and len(left_cheek_center) > 0 and len(left_eye_center) > 0 and len(left_cheek_center) > 0:
+    if len(right_face_indices) > 0 and len(left_face_points):
 
         # computer disntance between cheekbones and eyes
-        d1 = (left_eye_center[0] - left_cheek_center[0])
-        d2 = (right_cheek_center[0] - right_eye_center[0])
+        d1 = get_distance(left_face_points)
+        d2 = get_distance(right_face_points)
         d = d1 + d2
 
         x_min = int(image_cols * 0.55)
@@ -103,7 +104,7 @@ def detect(
             # draw the slider
             draw_slider(image, x_min, x_max)
             cv2.circle(image, pointer, 10, BLUE_COLOR, -1)
-            draw_eyes_line(image, right_eye_center, left_eye_center, offset=100)
+            draw_horizontal_face_line(image, [*right_face_points, *left_face_points], offset=100)
         
     return scaled_value
     # return True if scaled_value < offset or scaled_value > -offset else False

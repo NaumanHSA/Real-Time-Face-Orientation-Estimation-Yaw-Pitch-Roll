@@ -14,7 +14,7 @@ IMAGE_SIZE = (1080, 720)
 MAX_NUMBER_FACES = 1
 
 # whether to draw visualizations or not
-VIS = False
+VIS = True
 
 """ Thresholds Configurations """
 

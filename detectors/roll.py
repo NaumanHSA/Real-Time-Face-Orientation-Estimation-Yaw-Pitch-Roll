@@ -42,38 +42,40 @@ def draw_slider(image, x_min, x_max):
 def detect(
     image: np.ndarray,
     landmark_list: landmark_pb2.NormalizedLandmarkList,
-    right_eye_indices: list,
-    left_eye_indices: list,
+    roll_indices: list,
     vis=True):
 
     image_rows, image_cols, _ = image.shape
-    right_eye_points = []
-    left_eye_points = []
-
+    x = []
+    y = []
     circle_radius = 2
     for idx, landmark in enumerate(landmark_list.landmark):
         landmark_px = normalized_to_pixel_coordinates(landmark.x, landmark.y, image_cols, image_rows)
 
         # only draw the landmarks specified in the filter_lansmarks
-        if idx in right_eye_indices and landmark_px:
-            right_eye_points.append(landmark_px)
-        elif idx in left_eye_indices and landmark_px:
-            left_eye_points.append(landmark_px)
+        if idx in roll_indices and landmark_px:
+            x.append(landmark_px[0])
+            y.append(landmark_px[1])
         else:
             continue
-    
+        
         if vis:
             cv2.circle(image, landmark_px, circle_radius, RED_COLOR, -1)
 
-    right_eye_center = [int(statistics.mean(i)) for i in zip(*right_eye_points)]
-    left_eye_center = [int(statistics.mean(i)) for i in zip(*left_eye_points)]
+    angle = 90    
+    if len(x) > 0 and len(y) > 0:
+        # find the coefficients for the best fit line on x and y
+        m, b = np.polyfit(x, y, 1)
+            
+        # straight line equation:
+        # y = mx + b  -->     x = (y - b) / x
+        y1, y2 = max(y), min(y)
+        x1, x2 = int((y1 - b) / m), int((y2 - b) / m)
 
-    angle = 90
-    if len(right_eye_center) > 0 and len(left_eye_center) > 0:
         # compute the angle between the eye centroids
-        dY = right_eye_center[1] - left_eye_center[1]
-        dX = right_eye_center[0] - left_eye_center[0]
-        angle = np.degrees(np.arctan2(dY, dX)) + 90
+        dY = y2 - y1
+        dX = x2 - x1
+        angle = np.degrees(np.arctan2(dY, dX)) + 180
 
         x_min = int(image_cols * 0.55)
         x_max = int(image_cols * 0.95)
@@ -90,4 +92,5 @@ def detect(
             draw_slider(image, x_min, x_max)
             cv2.circle(image, pointer, 10, BLUE_COLOR, -1)
 
+    print(angle)
     return (int(angle) - 90)
