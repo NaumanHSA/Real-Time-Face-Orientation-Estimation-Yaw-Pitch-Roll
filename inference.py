@@ -40,6 +40,9 @@ with mp_face_mesh.FaceMesh(
             # If loading a video, use 'break' instead of 'continue'.
             continue
         
+        pitch_index, yaw_index, roll_angle = 'n/a', 'n/a', 'n/a'
+        is_pitch, is_yaw, is_roll = False, False, False
+        pitch_message, yaw_message, roll_message, = '', '', ''
         try:
             # resize the image
             image = resize(image, dim=cfg.IMAGE_SIZE)
@@ -55,10 +58,7 @@ with mp_face_mesh.FaceMesh(
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-            is_pitch, is_yaw, is_roll = False, False, False
-            pitch_message, yaw_message, roll_message, = '', '', ''
             if results.multi_face_landmarks:
-                
                 for face_landmarks in results.multi_face_landmarks:
                     
                     # draw face rectangle
@@ -118,31 +118,31 @@ with mp_face_mesh.FaceMesh(
                         is_yaw = False
                         yaw_message = "Looking towards Right"
 
-                    # draw the results
-                    drawing_utils.draw_results(
-                        image, 
-                        pitch_index, yaw_index, roll_angle, 
-                        is_pitch, is_yaw, is_roll,
-                        pitch_message, yaw_message, roll_message)
-
-            # Flip the image horizontally for a selfie-view display.
-            # cv2.imshow("MediaPipe Face Mesh", cv2.flip(image, 1))
-            cv2.imshow("MediaPipe Face Mesh", image)
-
-            key = cv2.waitKey(1)
-            if key == 32 or key == ord('c'):
-                # save the current image
-                image_name = datetime.now().strftime("%m-%d-%Y_%H-%M-%S") + '.jpg'
-                image_path = os.path.join(cfg.OUTPUT_IMAGES_PATH, image_name)
-                cv2.imwrite(image_path, image_backup)
-
-                # open the last captured image in a new window
-                cv2.imshow("Last Captured Image", image_backup)
-
-            if key & 0xFF == 27:
-                break
         except Exception as e:
-            print(e)
+            pass
+        
+        # draw the results
+        drawing_utils.draw_results(
+            image, 
+            pitch_index, yaw_index, roll_angle, 
+            is_pitch, is_yaw, is_roll,
+            pitch_message, yaw_message, roll_message)
+
+        # Flip the image horizontally for a selfie-view display.
+        # cv2.imshow("MediaPipe Face Mesh", cv2.flip(image, 1))
+        cv2.imshow("MediaPipe Face Mesh", image)
+
+        key = cv2.waitKey(1)
+        if key == 32 or key == ord('c'):
+            # save the current image
+            image_name = datetime.now().strftime("%m-%d-%Y_%H-%M-%S") + '.jpg'
+            image_path = os.path.join(cfg.OUTPUT_IMAGES_PATH, image_name)
+            cv2.imwrite(image_path, image_backup)
+
+            # open the last captured image in a new window
+            cv2.imshow("Last Captured Image", image_backup)
+        elif key & 0xFF == 27:
+            break
 
 cap.release()
 cv2.destroyAllWindows()

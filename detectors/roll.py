@@ -92,5 +92,4 @@ def detect(
             draw_slider(image, x_min, x_max)
             cv2.circle(image, pointer, 10, BLUE_COLOR, -1)
 
-    print(angle)
     return (int(angle) - 90)
