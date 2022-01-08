@@ -21,6 +21,7 @@ This repository focuses on real-time estimation of face orientation in terms of 
 
 Our algorithm works on the top of MediaPipe Face Mesh solution that has been used as the base layer for the estimation of face geomatery of 468 landmarks. It utilizes some specific landmarks for estimating orientation for each dimension given in the Table 1. Our solution estimates Pitch index and Yaw index giving values between 0 and 1 and roll angle giving a value between 0 and 180 degrees. The estimated values are then compared to certain thresholds (specified by the user) to inform the user of its face orientation e.g. if user is looking towards too down or up.
 
+
 <br>
 <div align="center">
   <img width="80%" src="./gallery/face_landmarks_2.png"></a>
